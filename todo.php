@@ -4,8 +4,6 @@
 $items = array();
 
 
-
-
 // The loop!
 do {
     // Iterate through list items
@@ -34,7 +32,7 @@ do {
 
         $key = trim(fgets(STDIN));
         $key--;
-        // Remove from array
+        // Remove from array by subtracting 1
         unset($items[$key]);
     } $items = array_values($items);
 // Exit when input is (Q)uit
