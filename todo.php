@@ -8,7 +8,8 @@ function list_items($list)
     foreach($list as $key => $value)
     {
         $key++;
-        echo "[{$key}] {$value}" . PHP_EOL;
+        $result .= "[{$key}] {$value}" . PHP_EOL;
+        // echo "[{$key}] {$value}" . PHP_EOL;
     }
     return $result;
 }
