@@ -43,31 +43,52 @@ function sort_menu($items)
 }
 
 
-do {
+do 
+{
     echo list_items($items);
-    echo '(N)ew item, (R)emove item, (S)ort items, (Q)uit) : ';
-
+    echo '(N)ew item, (R)emove item, (S)ort, (Q)uit : ';
     $input = get_input(true);
 
-    if ($input == 'N')
+    if ($input == 'N') 
     {
         echo 'Enter item: ';
+        $item = trim(fgets(STDIN));
 
-        $items[] = get_input();
+        // $temp = get_input;
 
+        echo 'Would you like this item at the (B)eginning or the (E)nd of your list? ';
+        
+        $b_and_e = get_input(true);
 
-    } elseif ($input == 'R') {
+       if ($b_and_e == 'B')
+       {
+           array_unshift($items, $item);
+       }
+       elseif ($b_and_e == 'E')
+       {
+           array_push($items, $item);
+       }
+   }
+    elseif ($input == 'R') 
+    {
         echo 'Enter item number to remove: ';
-
         $key = get_input();
         $key--;
-
         unset($items[$key]);
-
-    } elseif ($input == 'S') {
-       $items = sort_menu($items);
-
-}
+        $items = array_values($items);
+    }
+    elseif ($input == 'F')
+    {
+        array_shift($items);
+    }
+    elseif ($input == 'L')
+    {
+        array_pop($items);
+    }
+    elseif ($input == 'S')
+    {
+        $items = sort_menu($items);
+    }
 
        
 
