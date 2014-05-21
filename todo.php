@@ -25,6 +25,32 @@ function get_input($upper = false) {
     }
 }
 
+// function for sorting your items menu how you'd like
+function sort_menu($items)
+{
+    echo "(A)-Z, (Z)-A, (O)rder entered, (R)everse order entered: ";
+    $input = get_input(true); 
+
+    // sort the $items
+    switch ($input) 
+    {
+        case 'A':
+            asort($items, SORT_NATURAL|SORT_FLAG_CASE);
+            break;
+        case 'Z':
+            arsort($items, SORT_NATURAL|SORT_FLAG_CASE);
+            break;
+        case 'O':
+            ksort($items, SORT_NATURAL|SORT_FLAG_CASE);
+            break;
+        case 'R':
+            krsort($items, SORT_NATURAL|SORT_FLAG_CASE);
+            break;
+    }
+
+    return $items;   
+}
+
 function read_file($filename) {
     $handle = fopen($filename, "r");
     $contents = fread($handle, filesize($filename));
