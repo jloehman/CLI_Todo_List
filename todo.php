@@ -1,126 +1,136 @@
 <?php
 
+// Create array to hold list of todo items
 $items = array();
 
-// function to display the results of your items list
-function list_items($list)
-{
-    $result = '';
-
-    foreach ($list as $key => $value)
-    {
-        $result .= "[" . ($key + 1) . "] {$value}\n";  
+function list_items($list) {
+    $place = '';
+    // Iterate through list items
+    foreach ($list as $key => $item) {
+        $newKey = $key + 1;
+        $place .= "[" . $newKey . "]" . " " . $item . PHP_EOL;
+    // Display each item and a newline
     }
-    return $result;
+    return $place;
 }
 
-// function that reads the input of your user
-function get_input($upper = false) 
-{
-    $result = trim(fgets(STDIN));
-    return $upper ? strtoupper($result) : $result;
-}
-
-// function for sorting your items menu how you'd like
-function sort_menu($items)
-{
-    echo "(A)-Z, (Z)-A, (O)rder entered, (R)everse order entered: ";
-    $input = get_input(true); 
-
-    // sort the $items
-    switch ($input) 
-    {
-        case 'A':
-            asort($items, SORT_NATURAL|SORT_FLAG_CASE);
-            break;
-        case 'Z':
-            arsort($items, SORT_NATURAL|SORT_FLAG_CASE);
-            break;
-        case 'O':
-            ksort($items, SORT_NATURAL|SORT_FLAG_CASE);
-            break;
-        case 'R':
-            krsort($items, SORT_NATURAL|SORT_FLAG_CASE);
-            break;
+// Get STDIN, strip whitespace and newlines, 
+// and convert to uppercase if $upper is true
+function get_input($upper = false) {
+    // Return filtered STDIN input
+    if($upper == TRUE) {
+        return strtoupper(trim(fgets(STDIN)));
+    } else {
+        return trim(fgets(STDIN));
     }
-
-    return $items;   
 }
 
-// function that imports a file to the list
-function read_file()
-{
-    echo "Enter the filename: ";
-    $filename = get_input();
-    $handle = fopen($filename, 'r');
-    $contents = trim(fread($handle, filesize($filename)));
-    return $contents;
+function read_file($filename) {
+    $handle = fopen($filename, "r");
+    $contents = fread($handle, filesize($filename));
+    $contents_array = explode("\n", $contents);
     fclose($handle);
+    return $contents_array;
 }
 
-do 
-{
+function save_file($filename, $data_to_save){
+
+    $input = 'Y';
+
+    if (file_exists($filename)) {
+        echo "This will overwrite the file. Are you sure? Y or N? ";
+        $input = get_input(TRUE);
+    }
+
+    if ($input == 'Y') {
+        $handle = fopen($filename, 'w');
+        $contents = implode("\n", $data_to_save);
+        fwrite($handle, $contents);
+        fclose($handle);
+    } else {
+        echo "No changes were made.\n";
+    }
+
+}
+
+do {
+    // Echo the list produced by the function
     echo list_items($items);
-    echo '(N)ew item, (R)emove item, (S)ort, (O)pen file, (Q)uit : ';
+
+    // Show the menu options
+    echo '(N)ew item, (R)emove item, (S)ort items, File (M)anager, (Q)uit: ';
+
+    // Get the input from user
     $input = get_input(true);
+
+    // Check for actionable input
+    if ($input == 'N') {
+        // Ask for entry
+        echo 'Enter item: ';
+        // Add entry to list array
+        $newItem = get_input();
+            echo 'Would you like that at the (B)eginning or the (E)nd? ';
+            $input = get_input(TRUE);
+            if ($input == 'B') {
+                array_unshift($items, $newItem);
+            } elseif ($input == 'E') {
+                array_push($items, $newItem);
+            } else {
+                array_push($items, $newItem);
+            }
     
-    // to put in a new item
-    if ($input == 'N') 
-    {   
-        echo "Enter item: ";
-        $item = trim(fgets(STDIN));
-
-        echo "Add this item to the [B]eginning or [E]nd of list: ";
-        $b_and_e = get_input(true);
-
-        // option for putting the item in the beginning
-        if ($b_and_e == 'B')
-        {
-            array_unshift($items, $item);
-        }
-
-        // option for putting the item on the end
-        elseif ($b_and_e == 'E')
-        {
-            array_push($items, $item);
-        }
-    } 
-    // option for removing any item
-    elseif ($input == 'R') 
-    {
+    } elseif ($input == 'R') {
+        // Remove which item?
         echo 'Enter item number to remove: ';
+        // Get array key
         $key = get_input();
-        $key--;
-        unset($items[$key]);
-        $items = array_values($items);
-    }
-    // hidden option to remove the first item
-    elseif ($input == 'F')
-    {
+        // Remove from array
+        unset($items[--$key]);
+        // Adding sort input
+    
+    } elseif ($input == 'S') {
+        // Alphabetical or Reverse alphabet?
+        echo '(A)-Z or (Z)-A?: ';
+        // Getting input
+        $sortOption = get_input(TRUE);
+        // Evaluating input 
+        if ($sortOption == 'A') {
+            // Sort function
+            sort($items);
+        
+        } elseif ($sortOption == 'Z') {
+            rsort($items);
+        }
+
+    } elseif ($input == 'F') {
         array_shift($items);
-    }
-    // hidden option to remove the last item
-    elseif ($input == 'L')
-    {
+
+    } elseif ($input == 'L') {
         array_pop($items);
-    }
-    // option for sorting your list
-    elseif ($input == 'S')
-    {
-        $items = sort_menu($items);
-    }
-    // option for opening a file
-    elseif ($input == 'O')
-    {      
-        $contents = read_file();
-        // explode the string into an array
-        $content_array = explode("\n", $contents);
-        $items = array_merge($items, $content_array);
-    }
-} 
-// quitting option
-while ($input != 'Q');
 
-echo "Goodbye!\n";
+    } elseif ($input == 'M') {
+
+        echo "(O)pen or (S)ave file? ";
+        $input = get_input(TRUE);
+
+        echo "Enter filename: ";
+        $filename = get_input();
+
+        if($input == 'S'){
+            save_file($filename, $items);
+            echo "\nSaving file...\n\n";
+        } elseif($input == 'O') {
+            $new_items = read_file($filename);
+            $items = array_merge($items, $new_items);
+            echo "\nMerging...\n\n";
+        }
+    }
+// Exit when input is (Q)uit
+} while ($input != 'Q');
+
+// Say Goodbye!
+echo "wait for it... Goodbye!\n";
+
+// Exit with 0 errors
 exit(0);
-
+?>
